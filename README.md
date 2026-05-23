@@ -39,6 +39,8 @@
 - **WinAPI:** `SetWindowsHookExW` (WH_KEYBOARD_LL), `SendMessageW` (WM_INPUTLANGCHANGEREQUEST), `GetKeyboardLayout`, `GetForegroundWindow`
 - **Крейты:** `windows` 0.58
 
+Сделано методом **вайб-кодинга** в оболочке [OpenCode](https://opencode.ai) на модели `opencode/deepseek-v4-flash-free`.
+
 ## Установка
 
 Скачайте `ableton-ru-hotkeys.exe` из [релизов](https://github.com/devZu9/ableton-ru-hotkeys/releases) и запустите. Никакой установки не требуется.
