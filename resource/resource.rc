@@ -1,6 +1,31 @@
-#include <winver.h>
+﻿#pragma code_page(65001)
+#include <windows.h>
 
-IDI_ICON ICON "resource/icon.ico"
+#define IDI_APP 101
+#define IDD_SETTINGS 102
+#define IDD_TRAY_MSG 103
+#define IDC_AUTOSTART     1000
+#define IDC_START_MINIMIZED 1001
+#define IDC_SAVE          1002
+
+IDI_APP ICON "resource/icon.ico"
+
+IDD_TRAY_MSG DIALOGEX 0, 0, 0, 0
+STYLE WS_POPUP
+BEGIN
+END
+
+IDD_SETTINGS DIALOGEX 0, 0, 310, 120
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Настройки"
+FONT 9, "Segoe UI", 400, 0, 0x1
+BEGIN
+    CONTROL "Автозагрузка при старте системы", IDC_AUTOSTART, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 15, 15, 280, 15
+    CONTROL "Запускать в свёрнутом виде", IDC_START_MINIMIZED, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 15, 38, 280, 15
+    CONTROL "", -1, "Static", SS_ETCHEDHORZ, 15, 62, 280, 1
+    CONTROL "Сохранить", IDC_SAVE, "Button", BS_DEFPUSHBUTTON | WS_TABSTOP, 90, 80, 90, 25
+    CONTROL "Отмена", IDCANCEL, "Button", BS_PUSHBUTTON | WS_TABSTOP, 180, 80, 90, 25
+END
 
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     0,2,0,0
