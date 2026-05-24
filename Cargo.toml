@@ -2,6 +2,10 @@
 name = "ableton-ru-hotkeys"
 version = "0.1.0"
 edition = "2024"
+build = "build.rs"
+
+[build-dependencies]
+embed-resource = "3.0"
 
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.58", features = [
