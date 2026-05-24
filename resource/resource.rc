@@ -3,16 +3,23 @@
 
 #define IDI_APP 101
 #define IDD_SETTINGS 102
-#define IDD_TRAY_MSG 103
+#define IDD_SPLASH 104
 #define IDC_AUTOSTART     1000
 #define IDC_START_MINIMIZED 1001
 #define IDC_SAVE          1002
 
 IDI_APP ICON "resource/icon.ico"
 
-IDD_TRAY_MSG DIALOGEX 0, 0, 0, 0
-STYLE WS_POPUP
+IDD_SPLASH DIALOGEX 0, 0, 300, 130
+STYLE DS_SETFONT | DS_CENTER | WS_POPUP
+EXSTYLE WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE
+FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
+    CTEXT "Ableton RU Hotkeys", -1, 10, 20, 280, 25
+    CTEXT "Версия 1.0", -1, 10, 48, 280, 15
+    CONTROL "", -1, "Static", SS_ETCHEDHORZ, 10, 70, 280, 1
+    CTEXT "Автоматическое переключение раскладки", -1, 10, 80, 280, 15
+    CTEXT "для горячих клавиш в Ableton Live", -1, 10, 98, 280, 15
 END
 
 IDD_SETTINGS DIALOGEX 0, 0, 310, 120
@@ -28,10 +35,10 @@ BEGIN
 END
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION     0,2,0,0
-PRODUCTVERSION  0,2,0,0
+FILEVERSION     1,0,0,0
+PRODUCTVERSION  1,0,0,0
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
-FILEFLAGS       VS_FF_PRERELEASE
+FILEFLAGS       0
 FILEOS          VOS_NT_WINDOWS32
 FILETYPE        VFT_APP
 FILESUBTYPE     VFT2_UNKNOWN
@@ -42,12 +49,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName",      ""
             VALUE "FileDescription",  "Ableton RU Hotkeys"
-            VALUE "FileVersion",      "0.2.0.0"
+            VALUE "FileVersion",      "1.0.0.0"
             VALUE "InternalName",     "ableton-ru-hotkeys"
             VALUE "LegalCopyright",   ""
             VALUE "OriginalFilename", "ableton-ru-hotkeys.exe"
             VALUE "ProductName",      "Ableton RU Hotkeys"
-            VALUE "ProductVersion",   "0.2.0.0"
+            VALUE "ProductVersion",   "1.0.0.0"
         END
     END
     BLOCK "VarFileInfo"

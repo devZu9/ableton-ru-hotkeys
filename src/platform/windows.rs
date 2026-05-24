@@ -16,6 +16,7 @@ const IDM_SETTINGS: usize = 202;
 const IDM_EXIT: usize = 203;
 const IDI_APP: u16 = 101;
 const IDD_SETTINGS: u16 = 102;
+const IDD_SPLASH: u16 = 104;
 const IDC_AUTOSTART: i32 = 1000;
 const IDC_START_MINIMIZED: i32 = 1001;
 const IDC_SAVE: i32 = 1002;
@@ -262,9 +263,31 @@ unsafe extern "system" fn tray_wnd_proc(
     }
 }
 
+unsafe extern "system" fn splash_dlg_proc(
+    hwnd: HWND, msg: u32, _wparam: WPARAM, _lparam: LPARAM,
+) -> isize {
+    unsafe {
+        match msg {
+            WM_INITDIALOG => {
+                let _ = SetTimer(hwnd, 1, 3000, None);
+                1
+            }
+            WM_TIMER => {
+                let _ = KillTimer(hwnd, 1);
+                let _ = EndDialog(hwnd, 0);
+                1
+            }
+            _ => 0,
+        }
+    }
+}
+
 pub fn run() {
     unsafe {
         let _ = SetConsoleOutputCP(65001);
+
+        let splash_inst = GetModuleHandleA(None).unwrap();
+        let _ = DialogBoxParamW(splash_inst, PCWSTR(IDD_SPLASH as *const u16), None, Some(splash_dlg_proc), LPARAM(0));
 
         let instance = GetModuleHandleA(None).unwrap();
 
