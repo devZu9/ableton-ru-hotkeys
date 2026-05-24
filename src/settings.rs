@@ -24,7 +24,7 @@ pub fn load() -> (bool, bool) {
         Err(_) => return (true, false),
     };
     let mut autostart = true;
-    let mut minimized = false;
+    let mut minimized = true;
     for line in content.lines() {
         let line = line.trim();
         if line.is_empty() || line.starts_with(';') || line.starts_with('#') {

@@ -286,8 +286,16 @@ pub fn run() {
     unsafe {
         let _ = SetConsoleOutputCP(65001);
 
+        let console = GetConsoleWindow();
+        let _ = ShowWindow(console, SW_HIDE);
+
         let splash_inst = GetModuleHandleA(None).unwrap();
         let _ = DialogBoxParamW(splash_inst, PCWSTR(IDD_SPLASH as *const u16), None, Some(splash_dlg_proc), LPARAM(0));
+
+        let (_, minimized) = settings::load();
+        if !minimized {
+            let _ = ShowWindow(console, SW_SHOW);
+        }
 
         let instance = GetModuleHandleA(None).unwrap();
 
@@ -325,11 +333,6 @@ pub fn run() {
         println!("  - Shift НЕ является триггером (нужен для заглавных букв)");
         println!("  - Когда все триггеры отпущены — возвращает RU");
         println!("  - При потери фокуса раскладка НЕ меняется\n");
-
-        let (_, minimized) = settings::load();
-        if minimized {
-            let _ = ShowWindow(GetConsoleWindow(), SW_HIDE);
-        }
 
         let mut msg = MSG::default();
         while GetMessageW(&mut msg, None, 0, 0).as_bool() {
