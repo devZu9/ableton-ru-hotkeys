@@ -20,6 +20,7 @@ const IDD_SPLASH: u16 = 104;
 const IDC_AUTOSTART: i32 = 1000;
 const IDC_START_MINIMIZED: i32 = 1001;
 const IDC_SAVE: i32 = 1002;
+const IDC_SPLASH_ICON: i32 = 1003;
 
 const RU_HKL: usize = 0x04190419;
 const EN_HKL: usize = 0x04090409;
@@ -270,6 +271,12 @@ unsafe extern "system" fn splash_dlg_proc(
         match msg {
             WM_INITDIALOG => {
                 let _ = SetTimer(hwnd, 1, 3000, None);
+                if let Ok(inst) = GetModuleHandleA(None) {
+                    if let Ok(h) = LoadImageW(inst, PCWSTR(IDI_APP as *const u16), GDI_IMAGE_TYPE(1), 64, 64, IMAGE_FLAGS(0)) {
+                        let icon_ctrl = GetDlgItem(hwnd, IDC_SPLASH_ICON).unwrap();
+                        let _ = SendMessageW(icon_ctrl, 0x0173, WPARAM(h.0 as usize), LPARAM(0));
+                    }
+                }
                 1
             }
             WM_TIMER => {
