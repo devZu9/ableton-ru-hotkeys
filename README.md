@@ -57,7 +57,7 @@ src/
 - **WinAPI:** `SetWindowsHookExW` (WH_KEYBOARD_LL), `SendMessageW` (WM_INPUTLANGCHANGEREQUEST), `GetKeyboardLayout`, `GetForegroundWindow`
 - **Крейты:** `windows` 0.58 (только Windows)
 
-Сделано методом **вайб-кодинга** в оболочке [OpenCode](https://opencode.ai) на модели `opencode/deepseek-v4-flash-free`.
+Сделано методом **вайб-кодинга** в оболочке [OpenCode](https://opencode.ai/go?ref=DHSKBMGTK0) на модели `opencode/deepseek-v4-flash-free`.
 
 ## Установка
 

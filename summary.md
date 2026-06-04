@@ -1,59 +1,66 @@
-# Итоги сессии — Ableton RU Hotkeys (рефакторинг)
+## Цель
+- Создать утилиту для Windows, которая корректно обрабатывает горячие клавиши в Ableton Live при активной русской раскладке, переключая раскладку на английскую при зажатии Ctrl/Alt/Win и возвращая обратно после отпускания.
 
-## Сделано
+## Ограничения и предпочтения
+- Только Rust + WinAPI; без Tauri, без многопоточности
+- Глобальный хук `WH_KEYBOARD_LL`, событийное отслеживание модификаторов, детект окна Ableton, детект русской раскладки (0x04190419)
+- Переключение раскладки только через `SendMessageW(WM_INPUTLANGCHANGEREQUEST)`
+- Shift НЕ является триггером (нужен для заглавных русских букв)
+- При потере фокуса раскладка НЕ меняется (без автоматического восстановления)
+- Все сообщения пользователю на русском
+- Вывод консоли в UTF-8 через `SetConsoleOutputCP(65001)`
+- Кросс-платформенная структура: `core.rs` (общее) + `platform/windows.rs` + `platform/macos.rs` (заглушка)
+- `windows` зависимость только под `cfg(windows)`
+- Иконка в трее всегда присутствует; консоль скрывается/показывается левым кликом по трею
+- Правое меню трея: «О программе» (GitHub), «Настройки» (диалог), «Выход»
+- Настройки: автозагрузка + запуск свёрнутым — хранятся в `%APPDATA%\AbletonRUHotkeys\settings.ini`
+- .exe с метаданными (версия, описание, язык) и встроенной иконкой
+- **Сплэш-скрин** при запуске (модальный диалог, автозакрытие через 3 секунды)
+- **Консоль скрыта во время сплэша** — `ShowWindow(SW_HIDE)` до показа диалога
 
-### Рефакторинг под кросс-платформенность
+## Прогресс
+### Готово
+- Сплэш-скрин при запуске: модальный диалог (`IDD_SPLASH` в resource.rc) с названием, версией и описанием; закрывается через 3с (`SetTimer` → `EndDialog`)
+- Консоль скрывается до сплэша (`ShowWindow(GetConsoleWindow(), SW_HIDE)`); показывается после сплэша только если «Запускать в свёрнутом виде» выключено
+- Кросс-платформенное разделение: `src/core.rs` (общая логика — `ModifierState`, `vk_name()`, `is_trigger()`, `is_any_modifier()`, `ABLETON_TITLE`), `src/platform/mod.rs` (cfg селектор), `src/platform/windows.rs` (WH_KEYBOARD_LL, трей, меню, настройки, автозагрузка, сплэш), `src/platform/macos.rs` (заглушка), `src/main.rs` (тонкая точка входа)
+- `src/settings.rs`: INI-настройки (`%APPDATA%\AbletonRUHotkeys\settings.ini`), по умолчанию: `AutoStart=1`, `StartMinimized=1`
+- `Cargo.toml`: `windows` только под `[target.'cfg(windows)'.dependencies]`; `[build-dependencies] embed-resource = "3.0"`
+- `build.rs`: `embed_resource::compile("resource/resource.rc")` на Windows
+- `resource/resource.rc` (UTF-8 BOM): иконка, `IDD_SETTINGS` (автозагрузка + свёрнутый), `IDD_SPLASH`, `VS_VERSIONINFO` (v1.0.1.0, русский)
+- `resource/icon.ico`: иконка (фиолетовый фон + белая «RU», 16–256 px)
+- Системный трей: `STATIC`-окно с `HWND_MESSAGE`, подкласс через `SetWindowLongPtrW(GWLP_WNDPROC)`, левый клик — переключение консоли
+- Меню трея: «Показать окно / Скрыть окно» (динамический текст), «О программе» → GitHub, «Настройки», «Выход»
+- Диалог настроек: `DialogBoxParamW` с `BM_SETCHECK`/`BM_GETCHECK` через `GetDlgItem().unwrap()` (исправлено — ранее отправлялось на HWND диалога, а не контрола)
+- Автозагрузка: `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`
+- README.md на русском
+- Релизы GitHub: `v0.1.0-rc1` (MVP), `v0.2.0-rc1` (реструктуризация), **`v1.0.1`** (стабильный: трей + настройки + сплэш + все исправления)
 
-Проект перестроен: ядро (`core.rs`) + платформенные модули (`platform/windows.rs`, `platform/macos.rs`).
+### В работе
+- (нет)
 
-### Структура
+### Заблокировано
+- (нет)
 
-```
-src/
-├── main.rs           — точка входа (вызывает platform::run())
-├── core.rs           — общая логика: маппинг клавиш, модификаторы, константы
-└── platform/
-    ├── mod.rs        — #[cfg]-селектор нужной платформы
-    ├── windows.rs    — WinAPI: WH_KEYBOARD_LL, SendMessageW, раскладки
-    └── macos.rs      — заглушка (ждёт реализации)
-```
+## Ключевые решения
+- `SendMessageW(WM_INPUTLANGCHANGEREQUEST)` вместо `AttachThreadInput` + `ActivateKeyboardLayout` — первый не работал для RU→EN, второй работает в обе стороны
+- Событийное отслеживание модификаторов (`CTRL_HELD/ALT_HELD/WIN_HELD`) вместо `GetAsyncKeyState` — последний возвращал устаревшие значения внутри хука
+- `RESTORE_HWND` сохраняется при переключении на EN, чтобы возвращать раскладку правильному окну в многопоточном UI Ableton
+- `SetWindowLongPtrW(GWLP_WNDPROC)` для подкласса `STATIC`-окна вместо `RegisterClassW` (нет в выбранных фичах `windows` v0.58)
+- `SendMessageW(BM_SETCHECK/BM_GETCHECK)` через `GetDlgItem` вместо `CheckDlgButton`/`IsDlgButtonChecked` (тоже нет в фичах)
+- `embed-resource` v3.0 для встраивания версии и иконки
+- Настройки из реестра перенесены в INI-файл — проще редактировать и бэкапить
+- Сплэш через `DialogBoxParamW` (модальный, блокирует на 3с) — самый простой способ, не требует регистрации класса окна
+- Консоль скрывается до сплэша вызовом `ShowWindow(SW_HIDE)` в самом начале `run()`
 
-### Сборка
-
-- **Windows:** `cargo build --release` → `.exe` (как и раньше)
-- **macOS:** `cargo build --release --target aarch64-apple-darwin` → Mach-O бинарник
-- Зависимость `windows` подключается только на Windows (cfg)
-
-### Что в core.rs (общее для всех платформ)
-
-- `ModifierState` — структура для отслеживания Ctrl/Alt/Win
-- `vk_name()` — маппинг кода клавиши в имя
-- `is_trigger()` / `is_any_modifier()` — проверка модификаторов
-- `ABLETON_TITLE` — константа "Ableton"
-
-### Что в platform/windows.rs (только WinAPI)
-
-- `is_ableton_foreground()` — проверка активного окна
-- `is_russian_layout()` — определение раскладки через `GetKeyboardLayout`
-- `switch_to_en/ru_via_message()` — переключение через `SendMessageW(WM_INPUTLANGCHANGEREQUEST)`
-- `mods_prefix()` / `any_mod_held()` — хелперы для логирования
-- `hook_proc()` — callback WH_KEYBOARD_LL
-- `run()` — главный цикл
-
-### Для macOS в будущем
-
-В `platform/macos.rs` нужно реализовать:
-- `CGEventTap` вместо `WH_KEYBOARD_LL`
-- `TISSelectInputSource` вместо `WM_INPUTLANGCHANGEREQUEST`
-- Определение раскладки через `TISGetInputSourceProperty`
-- ID: `"com.apple.keylayout.US"` / `"com.apple.keylayout.Russian"`
-
-## Планы
-
-- Реализация macOS-бэкенда
-- Новая версия README, релиз
-
-## Ссылки
-
-- Репозиторий: https://github.com/devZu9/ableton-ru-hotkeys
-- Релиз: https://github.com/devZu9/ableton-ru-hotkeys/releases/tag/v0.1.0-rc1
+## Файлы проекта
+- `C:\_dev\ableton-ru-hotkeys\src\core.rs` — общая логика
+- `C:\_dev\ableton-ru-hotkeys\src\settings.rs` — INI-настройки
+- `C:\_dev\ableton-ru-hotkeys\src\platform\windows.rs` — полная реализация Windows
+- `C:\_dev\ableton-ru-hotkeys\src\platform\macos.rs` — заглушка macOS
+- `C:\_dev\ableton-ru-hotkeys\src\platform\mod.rs` — cfg-селектор
+- `C:\_dev\ableton-ru-hotkeys\src\main.rs` — точка входа
+- `C:\_dev\ableton-ru-hotkeys\resource\resource.rc` — ресурсы (диалоги, версия, иконка)
+- `C:\_dev\ableton-ru-hotkeys\resource\icon.ico` — иконка приложения
+- `C:\_dev\ableton-ru-hotkeys\build.rs` — сборка ресурсов
+- `C:\_dev\ableton-ru-hotkeys\Cargo.toml` — зависимости
+- `https://github.com/devZu9/ableton-ru-hotkeys` — репозиторий (последний тег `v1.0.1`)
