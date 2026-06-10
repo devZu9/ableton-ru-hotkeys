@@ -4,6 +4,7 @@ use windows::Win32::UI::WindowsAndMessaging::*;
 use windows::Win32::UI::Shell::*;
 use windows::Win32::System::LibraryLoader::GetModuleHandleA;
 use windows::Win32::System::Console::{SetConsoleOutputCP, GetConsoleWindow};
+use windows::Win32::System::Threading::CreateMutexW;
 use windows::Win32::System::Registry::*;
 use windows::core::{PCWSTR, w};
 use crate::core::*;
@@ -291,6 +292,14 @@ unsafe extern "system" fn splash_dlg_proc(
 
 pub fn run() {
     unsafe {
+        let _ = SetLastError(ERROR_SUCCESS);
+        if let Ok(mtx) = CreateMutexW(None, false, w!("Local\\AbletonRUHotkeysMutex")) {
+            if GetLastError() == ERROR_ALREADY_EXISTS {
+                println!("Ableton RU Hotkeys уже запущена.");
+                return;
+            }
+            let _ = mtx;
+        }
         let _ = SetConsoleOutputCP(65001);
 
         let console = GetConsoleWindow();
