@@ -1,7 +1,17 @@
-## Цель
-- Создать утилиту для Windows, которая корректно обрабатывает горячие клавиши в Ableton Live при активной русской раскладке, переключая раскладку на английскую при зажатии Ctrl/Alt/Win и возвращая обратно после отпускания.
+# ableton-ru-hotkeys — Summary
+
+## Состояние
+
+- **Текущая версия:** v1.0.3
+- **Стадия:** стабильная (релизы на GitHub `devZu9/ableton-ru-hotkeys`, последний тег v1.0.1)
+- **Платформа:** Windows (основная, одна машина); macOS — в разработке (заглушка `src/platform/macos.rs`)
+
+## Позиционирование
+
+Утилита для Windows, которая корректно обрабатывает горячие клавиши в Ableton Live при активной русской раскладке: переключает раскладку на английскую при зажатии Ctrl/Alt/Win и возвращает обратно после отпускания. Системный трей, настройки (INI), автозагрузка, сплэш-скрин.
 
 ## Ограничения и предпочтения
+
 - Только Rust + WinAPI; без Tauri, без многопоточности
 - Глобальный хук `WH_KEYBOARD_LL`, событийное отслеживание модификаторов, детект окна Ableton, детект русской раскладки (0x04190419)
 - Переключение раскладки только через `SendMessageW(WM_INPUTLANGCHANGEREQUEST)`
@@ -15,11 +25,13 @@
 - Правое меню трея: «О программе» (GitHub), «Настройки» (диалог), «Выход»
 - Настройки: автозагрузка + запуск свёрнутым — хранятся в `%APPDATA%\AbletonRUHotkeys\settings.ini`
 - .exe с метаданными (версия, описание, язык) и встроенной иконкой
-- **Сплэш-скрин** при запуске (модальный диалог, автозакрытие через 3 секунды)
-- **Консоль скрыта во время сплэша** — `ShowWindow(SW_HIDE)` до показа диалога
+- Сплэш-скрин при запуске (модальный диалог, автозакрытие через 3 секунды)
+- Консоль скрыта во время сплэша — `ShowWindow(SW_HIDE)` до показа диалога
 
 ## Прогресс
+
 ### Готово
+
 - Сплэш-скрин при запуске: модальный диалог (`IDD_SPLASH` в resource.rc) с названием, версией и описанием; закрывается через 3с (`SetTimer` → `EndDialog`)
 - Консоль скрывается до сплэша (`ShowWindow(GetConsoleWindow(), SW_HIDE)`); показывается после сплэша только если «Запускать в свёрнутом виде» выключено
 - Кросс-платформенное разделение: `src/core.rs` (общая логика — `ModifierState`, `vk_name()`, `is_trigger()`, `is_any_modifier()`, `ABLETON_TITLE`), `src/platform/mod.rs` (cfg селектор), `src/platform/windows.rs` (WH_KEYBOARD_LL, трей, меню, настройки, автозагрузка, сплэш), `src/platform/macos.rs` (заглушка), `src/main.rs` (тонкая точка входа)
@@ -33,15 +45,21 @@
 - Диалог настроек: `DialogBoxParamW` с `BM_SETCHECK`/`BM_GETCHECK` через `GetDlgItem().unwrap()` (исправлено — ранее отправлялось на HWND диалога, а не контрола)
 - Автозагрузка: `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`
 - README.md на русском
-- Релизы GitHub: `v0.1.0-rc1` (MVP), `v0.2.0-rc1` (реструктуризация), **`v1.0.1`** (стабильный: трей + настройки + сплэш + все исправления)
+- Релизы GitHub: `v0.1.0-rc1` (MVP), `v0.2.0-rc1` (реструктуризация), `v1.0.1` (стабильный: трей + настройки + сплэш + все исправления)
+- Защита от второго экземпляра (named mutex `Local\AbletonRUHotkeysMutex`)
+- Иконка пользователя (триколор + буква A) — v1.0.2; иконка на сплэше
+- Консоль не показывается во время сплэша, по умолчанию запуск свёрнутым — v1.0.1
 
 ### В работе
+
 - (нет)
 
 ### Заблокировано
+
 - (нет)
 
 ## Ключевые решения
+
 - `SendMessageW(WM_INPUTLANGCHANGEREQUEST)` вместо `AttachThreadInput` + `ActivateKeyboardLayout` — первый не работал для RU→EN, второй работает в обе стороны
 - Событийное отслеживание модификаторов (`CTRL_HELD/ALT_HELD/WIN_HELD`) вместо `GetAsyncKeyState` — последний возвращал устаревшие значения внутри хука
 - `RESTORE_HWND` сохраняется при переключении на EN, чтобы возвращать раскладку правильному окну в многопоточном UI Ableton
@@ -53,14 +71,22 @@
 - Консоль скрывается до сплэша вызовом `ShowWindow(SW_HIDE)` в самом начале `run()`
 
 ## Файлы проекта
-- `C:\_dev\ableton-ru-hotkeys\src\core.rs` — общая логика
-- `C:\_dev\ableton-ru-hotkeys\src\settings.rs` — INI-настройки
-- `C:\_dev\ableton-ru-hotkeys\src\platform\windows.rs` — полная реализация Windows
-- `C:\_dev\ableton-ru-hotkeys\src\platform\macos.rs` — заглушка macOS
-- `C:\_dev\ableton-ru-hotkeys\src\platform\mod.rs` — cfg-селектор
-- `C:\_dev\ableton-ru-hotkeys\src\main.rs` — точка входа
-- `C:\_dev\ableton-ru-hotkeys\resource\resource.rc` — ресурсы (диалоги, версия, иконка)
-- `C:\_dev\ableton-ru-hotkeys\resource\icon.ico` — иконка приложения
-- `C:\_dev\ableton-ru-hotkeys\build.rs` — сборка ресурсов
-- `C:\_dev\ableton-ru-hotkeys\Cargo.toml` — зависимости
-- `https://github.com/devZu9/ableton-ru-hotkeys` — репозиторий (последний тег `v1.0.1`)
+
+- `src\core.rs` — общая логика
+- `src\settings.rs` — INI-настройки
+- `src\platform\windows.rs` — полная реализация Windows
+- `src\platform\macos.rs` — заглушка macOS
+- `src\platform\mod.rs` — cfg-селектор
+- `src\main.rs` — точка входа
+- `resource\resource.rc` — ресурсы (диалоги, версия, иконка)
+- `resource\icon.ico` — иконка приложения
+- `build.rs` — сборка ресурсов
+- `Cargo.toml` — зависимости
+- `https://github.com/devZu9/ableton-ru-hotkeys` — репозиторий
+
+## Правила чтения журналов
+
+- **SESSIONS.md** — только заголовки сессий + тело текущей сессии.
+- **ROADMAP.md** — только насущные `[ ]` текущей версии.
+- **CHANGELOG.md** — НЕ читать (для пользователя).
+- **Аудит:** `C:\_dev\_for_OpenCode\audits\ableton-ru-hotkeys.md`
