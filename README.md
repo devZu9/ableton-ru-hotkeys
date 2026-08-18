@@ -1,6 +1,6 @@
 # Ableton RU Hotkeys
 
-**Версия:** v1.0.3
+**Версия:** v1.1.0
 
 Утилита для корректной работы горячих клавиш в **Ableton Live** при русской раскладке клавиатуры.
 
@@ -13,7 +13,7 @@
 
 ## Решение
 
-Утилита отслеживает нажатия клавиш через низкоуровневый хук (`WH_KEYBOARD_LL`) и при обнаружении зажатого `Ctrl`/`Alt`/`Win` с русской раскладкой отправляет окну Ableton Live сообщение `WM_INPUTLANGCHANGEREQUEST` для переключения раскладки на английскую.
+Утилита отслеживает нажатия клавиш и при обнаружении зажатого `Ctrl`/`Alt`/`Win` с русской раскладкой переключает раскладку на английскую. На Windows — через низкоуровневый хук `WH_KEYBOARD_LL` и сообщение `WM_INPUTLANGCHANGEREQUEST` окну Ableton Live; на macOS — через системный event tap (`CGEventTap`) и переключение источника ввода (`TIS`).
 
 После отпускания всех модификаторов раскладка возвращается на русскую.
 
@@ -29,9 +29,10 @@
 
 ## Требования
 
-- Windows 10/11
+- Windows 10/11 или macOS 12+
 - Ableton Live 10/11/12
 - Установленная русская и английская раскладки клавиатуры
+- macOS: разрешение «Специальные возможности» (System Settings → Privacy & Security → Accessibility) для терминала/приложения
 
 ## Архитектура
 
@@ -44,7 +45,7 @@ src/
 └── platform/
     ├── mod.rs        # селектор платформы (cfg)
     ├── windows.rs    # Windows: WH_KEYBOARD_LL, SendMessageW
-    └── macos.rs      # macOS: заглушка (в разработке)
+    └── macos.rs      # macOS: CGEventTap, TIS
 ```
 
 Сборка под нужную платформу происходит автоматически:
@@ -54,8 +55,8 @@ src/
 ## Технологии
 
 - **Язык:** Rust (edition 2024)
-- **WinAPI:** `SetWindowsHookExW` (WH_KEYBOARD_LL), `SendMessageW` (WM_INPUTLANGCHANGEREQUEST), `GetKeyboardLayout`, `GetForegroundWindow`
-- **Крейты:** `windows` 0.58 (только Windows)
+- **Windows:** WinAPI — `SetWindowsHookExW` (WH_KEYBOARD_LL), `SendMessageW` (WM_INPUTLANGCHANGEREQUEST), `GetKeyboardLayout`, `GetForegroundWindow`; крейт `windows` 0.58
+- **macOS:** фреймворки ApplicationServices (CGEventTap), CoreFoundation, Carbon (TIS) — без внешних крейтов; FFI-объявления в `src/platform/macos.rs`
 
 Сделано методом **вайб-кодинга** в оболочке [OpenCode](https://opencode.ai/go?ref=DHSKBMGTK0) на модели `opencode/deepseek-v4-flash-free`.
 

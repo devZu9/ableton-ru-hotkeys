@@ -18,7 +18,7 @@ FONT 9, "Segoe UI", 400, 0, 0x1
 BEGIN
     ICON IDI_APP, IDC_SPLASH_ICON, 15, 20, 64, 64
     LTEXT "Ableton RU Hotkeys", -1, 95, 25, 255, 20
-    LTEXT "Версия 1.0.3", -1, 95, 50, 255, 15
+    LTEXT "Версия 1.1.0", -1, 95, 50, 255, 15
     CONTROL "", -1, "Static", SS_ETCHEDHORZ, 15, 75, 340, 1
     LTEXT "Автоматическое переключение раскладки", -1, 15, 85, 340, 15, SS_CENTER
     LTEXT "для горячих клавиш в Ableton Live", -1, 15, 105, 340, 15, SS_CENTER
@@ -37,8 +37,8 @@ BEGIN
 END
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION     1,0,3,0
-PRODUCTVERSION  1,0,3,0
+FILEVERSION     1,1,0,0
+PRODUCTVERSION  1,1,0,0
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       0
 FILEOS          VOS_NT_WINDOWS32
@@ -51,12 +51,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName",      ""
             VALUE "FileDescription",  "Ableton RU Hotkeys"
-            VALUE "FileVersion",      "1.0.3.0"
+            VALUE "FileVersion",      "1.1.0.0"
             VALUE "InternalName",     "ableton-ru-hotkeys"
             VALUE "LegalCopyright",   ""
             VALUE "OriginalFilename", "ableton-ru-hotkeys.exe"
             VALUE "ProductName",      "Ableton RU Hotkeys"
-            VALUE "ProductVersion",   "1.0.3.0"
+            VALUE "ProductVersion",   "1.1.0.0"
         END
     END
     BLOCK "VarFileInfo"

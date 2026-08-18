@@ -3,11 +3,21 @@ use std::path::PathBuf;
 const APP_NAME: &str = "AbletonRUHotkeys";
 
 fn config_dir() -> PathBuf {
-    if let Some(appdata) = std::env::var_os("APPDATA") {
-        PathBuf::from(appdata).join(APP_NAME)
-    } else {
-        PathBuf::from(".").join(APP_NAME)
+    #[cfg(windows)]
+    {
+        if let Some(appdata) = std::env::var_os("APPDATA") {
+            return PathBuf::from(appdata).join(APP_NAME);
+        }
     }
+    #[cfg(target_os = "macos")]
+    {
+        if let Some(home) = std::env::var_os("HOME") {
+            return PathBuf::from(home)
+                .join("Library/Application Support")
+                .join(APP_NAME);
+        }
+    }
+    PathBuf::from(".").join(APP_NAME)
 }
 
 fn ini_path() -> PathBuf {
