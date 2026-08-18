@@ -16,6 +16,22 @@
 
 
 
+## Аудит проекта
+
+- Файл аудита: `C:\_dev\_for_OpenCode\audits\ableton-ru-hotkeys.md` (проведён 17.08.2026, канон на 419a9cb). При повторном аудите — актуализировать статусы Windows, раздел «Актуальность», маркер.
+
+## Сборка и тесты
+
+- Сборка: `cargo build --release` → `target/release/ableton-ru-hotkeys.exe`.
+- Тесты: `cargo test` (после добавления юнит-тестов `core.rs`, задание 5 аудита).
+- Скриншоты/эталоны состояний трея — принимать по скиллу `windows-tray-testing` (папка скриншотов — по согласованию).
+
+## Инструменты opencode
+
+- Команды: `/review`, `/test` (hard links на канон `_setup/prog_langs_kits/rust/command/`); агент `reviewer` в `.opencode/agent/`.
+- Скиллы (линки на канон `_setup/prog_langs_kits/rust/skills/`): rust-naming, rust-testing, rust-versioning, rust-single-source, rust-file-sizes, rust-encoding, rust-localization.
+- Универсальные скиллы/команды — глобальные линки машины (windows-tray-testing — для трея, computer-vision — для скриншотов).
+
 ## Нейминг и размер файлов
 
 ### Нейминг

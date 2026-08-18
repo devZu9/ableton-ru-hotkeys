@@ -1,0 +1,64 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["AGENTS.md", "SUMMARY.md"],
+  "skills": {
+    "paths": [".opencode/skills"],
+    "auto": [
+      "rust-naming",
+      "rust-testing",
+      "rust-versioning",
+      "rust-single-source",
+      "rust-file-sizes",
+      "rust-encoding",
+      "rust-localization"
+    ]
+  },
+  "agent": {
+    "plan": {
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "*": "deny",
+          "git fetch*": "allow",
+          "git status*": "allow",
+          "git log*": "allow",
+          "git rev-list*": "allow",
+          "git remote*": "allow",
+          "git diff*": "allow",
+          "git show*": "allow",
+          "git branch*": "allow",
+          "git -C * fetch*": "allow",
+          "git -C * status*": "allow",
+          "git -C * log*": "allow",
+          "git -C * rev-list*": "allow",
+          "git -C * remote*": "allow",
+          "git -C * diff*": "allow",
+          "git -C * show*": "allow",
+          "git -C * branch*": "allow",
+          "git config --get*": "allow",
+          "git config --list*": "allow",
+          "git config --global --get*": "allow",
+          "git config --global --list*": "allow",
+          "rg*": "allow",
+          "pwsh --version*": "allow",
+          "uname*": "allow",
+          "Test-Path*": "allow",
+          "Get-ChildItem*": "allow",
+          "Get-Content*": "allow",
+          "Select-String*": "allow"
+        }
+      }
+    }
+  },
+  "permission": {
+    "edit": "allow",
+    "bash": {
+      "git *": "allow",
+      "git push*": "ask",
+      "*": "allow",
+      "rm *": "ask",
+      "del *": "ask",
+      "Remove-Item*": "ask"
+    }
+  }
+}
